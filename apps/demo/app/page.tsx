@@ -1,6 +1,6 @@
 'use client'
 
-import { useTour } from "@tour-ai/sdk";
+import { useTour, scanPage } from "@tour-ai/sdk";
 
 export default function Home() {
   const { startTour } = useTour();
@@ -33,16 +33,31 @@ export default function Home() {
     })
   }
 
+  const handleScanPage = () => {
+    const interactables = scanPage();
+    console.log('--- Map of Intent (Scanned Interactables) ---');
+    console.table(interactables);
+    alert(`Found ${interactables.length} interactable elements. Check the console for details!`);
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex gap-4">
         <h1 id="hero-title" className="text-4xl font-bold">TourAI Project</h1>
-        <button
-          onClick={handleStartTour}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Start Onboarding
-        </button>
+        <div className="flex gap-4">
+          <button
+            onClick={handleStartTour}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
+          >
+            Start Onboarding
+          </button>
+          <button
+            onClick={handleScanPage}
+            className="bg-gray-800 hover:bg-black text-white font-bold py-2 px-4 rounded transition"
+          >
+            Scan Page
+          </button>
+        </div>
       </div>
 
       <div id="features-section" className="grid grid-cols-1 md:grid-cols-3 gap-8 my-12">
