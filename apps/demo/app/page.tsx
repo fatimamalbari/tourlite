@@ -1,81 +1,72 @@
 'use client'
 
-import { useTour } from "@tour-ai/sdk";
+import { useTour, scanPage } from "@tour-ai/sdk";
+import { useState } from 'react';
 
 export default function Home() {
   const { startTour } = useTour();
+  const [activeTab, setActiveTab] = useState('Overview');
 
   const handleStartTour = () => {
     startTour({
       id: 'demo-tour',
       steps: [
-        {
-          id: 'step-1',
-          title: 'Welcome to TourAI!',
-          content: 'This is the easiest lightweight onboarding SDK.',
-          target: '#hero-title',
-        },
-        {
-          id: 'step-2',
-          title: 'Smart Targeting',
-          content: 'We can target any element on the page using CSS selectors.',
-          target: '#features-section',
-          position: 'top',
-        },
-        {
-          id: 'step-3',
-          title: 'Ready to build?',
-          content: 'Start building your own tours today.',
-          target: '#start-button',
-          position: 'right',
-        }
+        { id: 'step-1', title: 'Welcome!', content: 'Welcome to the dashboard.', target: '#hero-title', position: 'bottom' },
+        { id: 'step-2', title: 'Sidebar', content: 'Navigate here.', target: '#sidebar', position: 'right' },
+        { id: 'step-3', title: 'Form Action', content: 'Submit your settings.', target: '#settings-form', position: 'top' }
       ]
     })
   }
 
+  const handleScanPage = () => {
+    const interactables = scanPage();
+    console.log('--- Map of Intent (Scanned Interactables) ---');
+    console.table(interactables);
+    alert(`Found ${interactables.length} elements. Check console!`);
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <h1 id="hero-title" className="text-4xl font-bold">TourAI Project</h1>
-        <button
-          onClick={handleStartTour}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Start Onboarding
-        </button>
-      </div>
+    <div>
+        <div className="flex justify-between items-center mb-8">
+          <h1 id="hero-title" className="text-3xl font-bold">Project Dashboard</h1>
+          <div className="flex gap-2">
+            <button onClick={handleStartTour} className="bg-blue-600 text-white px-4 py-2 rounded">Tour</button>
+            <button onClick={handleScanPage} className="bg-gray-800 text-white px-4 py-2 rounded">Scan</button>
+          </div>
+        </div>
 
-      <div id="features-section" className="grid grid-cols-1 md:grid-cols-3 gap-8 my-12">
-        <div className="p-6 border rounded-lg">
-          <h2 className="text-xl font-bold mb-2">Lightweight</h2>
-          <p>Under 10kb bundle size.</p>
+        {/* Tabs */}
+        <div className="flex gap-4 border-b mb-6">
+          {['Overview', 'Analytics', 'Settings'].map(tab => (
+            <button key={tab} onClick={() => setActiveTab(tab)} className={`pb-2 ${activeTab === tab ? 'border-b-2 border-blue-600 font-bold' : ''}`}>
+              {tab}
+            </button>
+          ))}
         </div>
-        <div className="p-6 border rounded-lg">
-          <h2 className="text-xl font-bold mb-2">AI-Native</h2>
-          <p>Generate tours with a single click.</p>
-        </div>
-        <div className="p-6 border rounded-lg">
-          <h2 className="text-xl font-bold mb-2">Easy to use</h2>
-          <p>React hooks & provider model.</p>
-        </div>
-      </div>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <button
-          id="start-button"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Get Started{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about TourAI features and API.
-          </p>
-        </button>
-      </div>
-    </main>
+        {/* Tabs Content */}
+        <div className="mt-6">
+          {activeTab === 'Overview' && (
+            <div id="settings-form" className="bg-white p-6 rounded-lg shadow">
+              <h3 className="text-lg font-bold mb-4">Overview Dashboard</h3>
+              <p>Welcome to your project overview. All your stats are here.</p>
+            </div>
+          )}
+          {activeTab === 'Analytics' && (
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h3 className="text-lg font-bold mb-4">Analytics</h3>
+              <p>Here you can see your traffic and user engagement charts.</p>
+            </div>
+          )}
+          {activeTab === 'Settings' && (
+            <div id="settings-form" className="bg-white p-6 rounded-lg shadow">
+              <h3 className="text-lg font-bold mb-4">Update Settings</h3>
+              <input type="text" placeholder="Project Name" className="border p-2 w-full mb-4 rounded" />
+              <textarea placeholder="Description" className="border p-2 w-full mb-4 rounded"></textarea>
+              <button className="bg-green-600 text-white px-6 py-2 rounded">Save Settings</button>
+            </div>
+          )}
+        </div>
+    </div>
   );
 }

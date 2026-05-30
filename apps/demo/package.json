@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@tour-ai/ai": "workspace:^",
     "@tour-ai/sdk": "workspace:^",
     "next": "16.2.6",
     "react": "19.2.4",
