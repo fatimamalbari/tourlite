@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, ReactNode } fr
 import { Tour, TourContextType, TourStep } from '../types'
 import { Tooltip } from './Tooltip'
 import { Overlay } from './Overlay'
+import { AiBuilder } from './AiBuilder'
 
 const TourContext = createContext<TourContextType | undefined>(undefined)
 
@@ -15,9 +16,10 @@ export const useTour = () => {
 
 interface TourProviderProps {
   children: ReactNode
+  enableBuilder?: boolean
 }
 
-export const TourProvider: React.FC<TourProviderProps> = ({ children }) => {
+export const TourProvider: React.FC<TourProviderProps> = ({ children, enableBuilder = false }) => {
   const [activeTour, setActiveTour] = useState<Tour | null>(null)
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [targetElement, setTargetElement] = useState<Element | null>(null)
@@ -70,6 +72,7 @@ export const TourProvider: React.FC<TourProviderProps> = ({ children }) => {
       }}
     >
       {children}
+      {enableBuilder && <AiBuilder />}
       {activeTour && currentStep && (
         <>
           <Overlay targetElement={targetElement} />

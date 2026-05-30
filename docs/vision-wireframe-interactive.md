@@ -1,0 +1,218 @@
+# Interactive Wireframe: TourAI Vision
+
+This wireframe demonstrates the "Zero-Config" AI onboarding experience. 
+
+## Vision Overview
+1.  **Developer Toolbar**: A floating input at the bottom of the page.
+2.  **Goal Input**: Developer types a goal like "Show how to create a project".
+3.  **AI Generation**: The SDK scans the DOM and generates steps automatically.
+4.  **Live Tour**: The user sees smooth transitions, spotlights, and professional copy.
+
+## Wireframe HTML Content
+Paste the following code into a local `wireframe.html` file to see the interactive prototype:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TourAI Wireframe - Vision</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse-ring {
+            0% { transform: scale(0.33); opacity: 1; }
+            80%, 100% { opacity: 0; }
+        }
+        .spotlight {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.5);
+            pointer-events: none;
+            z-index: 40;
+        }
+        .spotlight::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        .tooltip-animate {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+
+    <!-- Mock App UI -->
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white border-b px-8 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold text-blue-600">SaaSApp.io</div>
+            <nav class="flex gap-6 text-sm font-medium text-gray-600">
+                <a href="#" class="hover:text-blue-600">Dashboard</a>
+                <a href="#" id="analytics-nav" class="hover:text-blue-600">Analytics</a>
+                <a href="#" class="hover:text-blue-600">Settings</a>
+            </nav>
+            <button id="create-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition">
+                + New Project
+            </button>
+        </header>
+
+        <main class="p-8 flex-1">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <h1 class="text-2xl font-bold mb-4">Welcome back, Fatima!</h1>
+                    <p class="text-gray-500 mb-6">Here's what's happening with your projects today.</p>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                            <div class="text-xs text-blue-600 font-bold uppercase mb-1">Total Users</div>
+                            <div class="text-2xl font-bold">12,482</div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                            <div class="text-xs text-green-600 font-bold uppercase mb-1">Revenue</div>
+                            <div id="revenue-stat" class="text-2xl font-bold">$4,250</div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                            <div class="text-xs text-purple-600 font-bold uppercase mb-1">Conversion</div>
+                            <div class="text-2xl font-bold">3.2%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI BUILDER TOOLBAR (Developer Only View) -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-gray-700 z-50 w-[500px]">
+        <div class="bg-blue-500 p-2 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+        </div>
+        <input type="text" id="ai-prompt" placeholder="Describe the tour goal (e.g. 'Show how to create a project')" class="bg-gray-800 border-none text-sm rounded-lg flex-1 px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+        <button onclick="generateTour()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition">
+            <span>Generate</span>
+        </button>
+    </div>
+
+    <!-- AI TOUR COMPONENTS (Hidden by default) -->
+    <div id="overlay" class="fixed inset-0 bg-black/40 z-30 hidden transition-opacity duration-500 opacity-0"></div>
+    <div id="spotlight" class="spotlight hidden"></div>
+    
+    <div id="tooltip" class="fixed z-40 bg-white rounded-xl shadow-2xl border border-gray-200 p-5 w-72 hidden tooltip-animate">
+        <div class="flex justify-between items-start mb-3">
+            <div id="tour-step-indicator" class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Step 1 of 3</div>
+            <button onclick="closeTour()" class="text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        <h4 id="tour-title" class="font-bold text-gray-900 mb-1">AI Generated Title</h4>
+        <p id="tour-content" class="text-sm text-gray-600 mb-4 leading-relaxed">AI will write the professional copy for this step based on your UI.</p>
+        <div class="flex justify-between items-center">
+            <button id="prev-btn" onclick="prevStep()" class="text-xs font-semibold text-gray-400 hover:text-gray-600">Back</button>
+            <button onclick="nextStep()" class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                Next
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let tourSteps = [];
+
+        function generateTour() {
+            const prompt = document.getElementById('ai-prompt').value;
+            // Simulated AI Logic
+            tourSteps = [
+                {
+                    target: '#create-btn',
+                    title: 'Start your journey',
+                    content: 'Ready to build something new? Click here to launch your first project workflow.'
+                },
+                {
+                    target: '#analytics-nav',
+                    title: 'Monitor Progress',
+                    content: 'Track user behavior and conversion metrics in real-time right here.'
+                },
+                {
+                    target: '#revenue-stat',
+                    title: 'Revenue Overview',
+                    content: 'We automatically calculate your monthly recurring revenue for quick insights.'
+                }
+            ];
+
+            // Show simulation
+            const btn = document.querySelector('button[onclick="generateTour()"]');
+            btn.innerHTML = '<span class="animate-spin">🌀</span> Generating...';
+            
+            setTimeout(() => {
+                btn.innerHTML = '<span>Generate</span>';
+                startTour();
+            }, 1000);
+        }
+
+        function startTour() {
+            currentStep = 0;
+            document.getElementById('overlay').classList.remove('hidden');
+            setTimeout(() => document.getElementById('overlay').classList.add('opacity-100'), 10);
+            renderStep();
+        }
+
+        function renderStep() {
+            const step = tourSteps[currentStep];
+            const target = document.querySelector(step.target);
+            const tooltip = document.getElementById('tooltip');
+            const spotlight = document.getElementById('spotlight');
+            
+            tooltip.classList.remove('hidden');
+            spotlight.classList.remove('hidden');
+
+            // Update Content
+            document.getElementById('tour-step-indicator').innerText = `Step ${currentStep + 1} of ${tourSteps.length}`;
+            document.getElementById('tour-title').innerText = step.title;
+            document.getElementById('tour-content').innerText = step.content;
+            document.getElementById('prev-btn').style.visibility = currentStep === 0 ? 'hidden' : 'visible';
+
+            // Position Tooltip & Spotlight
+            const rect = target.getBoundingClientRect();
+            
+            spotlight.style.top = `${rect.top + (rect.height / 2) - 20}px`;
+            spotlight.style.left = `${rect.left + (rect.width / 2) - 20}px`;
+
+            tooltip.style.top = `${rect.bottom + 20}px`;
+            tooltip.style.left = `${rect.left + (rect.width / 2) - 144}px`;
+        }
+
+        function nextStep() {
+            if (currentStep < tourSteps.length - 1) {
+                currentStep++;
+                renderStep();
+            } else {
+                closeTour();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderStep();
+            }
+        }
+
+        function closeTour() {
+            document.getElementById('tooltip').classList.add('hidden');
+            document.getElementById('spotlight').classList.add('hidden');
+            document.getElementById('overlay').classList.add('opacity-0');
+            setTimeout(() => document.getElementById('overlay').classList.add('hidden'), 500);
+        }
+    </script>
+</body>
+</html>
+```
