@@ -1,7 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 async function testConnection() {
-  const apiKey = 'AIzaSyDlaq_rmUJDqlp0P4xVs5FqoWBHvJLegNI'
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+  if (!apiKey) {
+    console.error('No API Key found! Please set GOOGLE_GENERATIVE_AI_API_KEY environment variable.')
+    return
+  }
   const genAI = new GoogleGenerativeAI(apiKey)
   const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 

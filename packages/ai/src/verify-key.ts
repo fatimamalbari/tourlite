@@ -1,7 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 async function checkKey() {
-  const apiKey = 'AIzaSyDlaq_rmUJDqlp0P4xVs5FqoWBHvJLegNI'
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+  if (!apiKey) {
+    console.error('No API Key found! Please set GOOGLE_GENERATIVE_AI_API_KEY environment variable.')
+    return
+  }
   console.log('Testing new API Key...')
   
   try {
