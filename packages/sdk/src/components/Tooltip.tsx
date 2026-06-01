@@ -10,6 +10,7 @@ import {
   FloatingArrow,
   Placement,
 } from '@floating-ui/react'
+import { Sparkles, X } from 'lucide-react'
 import { TourStep } from '../types'
 
 interface TooltipProps {
@@ -53,6 +54,16 @@ export const Tooltip: React.FC<TooltipProps> = ({
     ],
   })
 
+  // Aurora Theme Colors
+  const colors = {
+    bg: '#181c1c',
+    border: '#2f3534',
+    fg: '#e7eceb',
+    muted: '#97a19f',
+    accent: '#2dd4bf',
+    accentFg: '#04110f',
+  }
+
   const style = targetElement 
     ? floatingStyles 
     : {
@@ -68,24 +79,43 @@ export const Tooltip: React.FC<TooltipProps> = ({
       ref={refs.setFloating}
       style={{
         ...style,
-        background: 'white',
-        color: '#1a1a1a',
+        background: colors.bg,
+        color: colors.fg,
         padding: '20px',
-        borderRadius: '12px',
-        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+        borderRadius: '14px',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
         zIndex: 1000,
-        maxWidth: '320px',
-        border: '1px solid #f0f0f0',
+        maxWidth: '300px',
+        border: `1px solid ${colors.border}`,
         fontFamily: 'system-ui, -apple-system, sans-serif',
         transition: 'transform 0.2s ease-out, opacity 0.2s ease-out',
       }}
     >
-      {targetElement && <FloatingArrow ref={arrowRef} context={context} fill="white" stroke="#f0f0f0" strokeWidth={1} />}
+      {targetElement && (
+        <FloatingArrow 
+          ref={arrowRef} 
+          context={context} 
+          fill={colors.bg} 
+          stroke={colors.border} 
+          strokeWidth={1} 
+        />
+      )}
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#0070f3', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Step {currentStepIndex + 1} of {totalSteps}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ 
+            fontSize: '10px', 
+            fontWeight: 700, 
+            background: colors.accent, 
+            color: colors.accentFg,
+            padding: '2px 8px',
+            borderRadius: '10px',
+            textTransform: 'uppercase'
+          }}>
+            {currentStepIndex + 1} / {totalSteps}
+          </span>
+          <Sparkles size={12} color={colors.accent} />
+        </div>
         <button 
           onClick={onClose}
           style={{ 
@@ -93,36 +123,29 @@ export const Tooltip: React.FC<TooltipProps> = ({
             background: 'none', 
             padding: '4px', 
             cursor: 'pointer',
-            color: '#999',
+            color: colors.muted,
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            alignItems: 'center'
           }}
-          aria-label="Close tour"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
+          <X size={14} />
         </button>
       </div>
 
-      <h3 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', fontWeight: 700 }}>{step.title}</h3>
-      <p style={{ margin: '0 0 20px 0', fontSize: '0.9rem', color: '#4b5563', lineHeight: 1.5 }}>{step.content}</p>
+      <h3 style={{ margin: '0 0 6px 0', fontSize: '14px', fontWeight: 600 }}>{step.title}</h3>
+      <p style={{ margin: '0 0 20px 0', fontSize: '12px', color: colors.muted, lineHeight: 1.6 }}>{step.content}</p>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <button 
           onClick={onPrev}
           disabled={isFirst}
           style={{ 
-            padding: '6px 0', 
-            fontSize: '0.85rem', 
-            fontWeight: 600,
+            fontSize: '12px', 
+            fontWeight: 500,
             cursor: isFirst ? 'default' : 'pointer',
             background: 'none',
             border: 'none',
-            color: isFirst ? '#d1d5db' : '#6b7280',
-            transition: 'color 0.2s'
+            color: isFirst ? '#444' : colors.muted,
           }}
         >
           Back
@@ -130,19 +153,18 @@ export const Tooltip: React.FC<TooltipProps> = ({
         <button 
           onClick={onNext}
           style={{ 
-            padding: '8px 16px', 
-            fontSize: '0.85rem', 
-            fontWeight: 700,
+            padding: '6px 16px', 
+            fontSize: '12px', 
+            fontWeight: 600,
             cursor: 'pointer',
-            background: '#0070f3',
-            color: 'white',
+            background: colors.accent,
+            color: colors.accentFg,
             border: 'none',
             borderRadius: '8px',
-            boxShadow: '0 4px 6px -1px rgba(0, 112, 243, 0.2)',
-            transition: 'all 0.2s',
+            transition: 'opacity 0.2s',
           }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#0062d6')}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#0070f3')}
+          onMouseOver={(e) => (e.currentTarget.style.opacity = '0.9')}
+          onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
         >
           {isLast ? 'Finish' : 'Next'}
         </button>

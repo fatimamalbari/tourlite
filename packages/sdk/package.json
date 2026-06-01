@@ -26,6 +26,7 @@
     "typescript": "latest"
   },
   "dependencies": {
-    "@floating-ui/react": "latest"
+    "@floating-ui/react": "latest",
+    "lucide-react": "^1.17.0"
   }
 }
