@@ -1,72 +1,135 @@
 'use client'
 
-import { useTour, scanPage } from "@tour-ai/sdk";
-import { useState } from 'react';
+import { metrics, tours, scanFeed } from "@/lib/tourlite";
+import { 
+  ArrowUpRight, 
+  ArrowDownRight, 
+  Layers, 
+  ChevronRight, 
+  ScanLine, 
+  Check, 
+  Plus 
+} from "lucide-react";
 
 export default function Home() {
-  const { startTour } = useTour();
-  const [activeTab, setActiveTab] = useState('Overview');
-
-  const handleStartTour = () => {
-    startTour({
-      id: 'demo-tour',
-      steps: [
-        { id: 'step-1', title: 'Welcome!', content: 'Welcome to the dashboard.', target: '#hero-title', position: 'bottom' },
-        { id: 'step-2', title: 'Sidebar', content: 'Navigate here.', target: '#sidebar', position: 'right' },
-        { id: 'step-3', title: 'Form Action', content: 'Submit your settings.', target: '#settings-form', position: 'top' }
-      ]
-    })
-  }
-
-  const handleScanPage = () => {
-    const interactables = scanPage();
-    console.log('--- Map of Intent (Scanned Interactables) ---');
-    console.table(interactables);
-    alert(`Found ${interactables.length} elements. Check console!`);
-  }
-
   return (
-    <div>
-        <div className="flex justify-between items-center mb-8">
-          <h1 id="hero-title" className="text-3xl font-bold">Project Dashboard</h1>
-          <div className="flex gap-2">
-            <button onClick={handleStartTour} className="bg-blue-600 text-white px-4 py-2 rounded">Tour</button>
-            <button onClick={handleScanPage} className="bg-gray-800 text-white px-4 py-2 rounded">Scan</button>
+    <div className="mx-auto max-w-6xl space-y-5">
+      {/* Heading */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">Welcome back, Fatima</h1>
+          <p className="mt-1 text-[13px] text-[var(--tl-muted)]">
+            Your AI-generated onboarding tours across 2 connected apps.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 rounded-[var(--tl-radius-sm)] border border-[var(--tl-border)] bg-[var(--tl-panel)] px-3 py-1.5 text-[12px] text-[var(--tl-muted)]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--tl-ok)]" />
+          1 scan running
+        </div>
+      </div>
+
+      {/* Metrics (Matching Wireframe Cards) */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {metrics.map((m) => (
+          <div
+            key={m.label}
+            className="rounded-[var(--tl-radius)] border border-[var(--tl-border)] bg-[var(--tl-panel)] p-4 shadow-sm"
+          >
+            <p className="text-[12px] text-[var(--tl-muted)]">{m.label}</p>
+            <div className="mt-1.5 flex items-end justify-between">
+              <span className="text-2xl font-semibold tracking-tight">{m.value}</span>
+              <span
+                className="flex items-center gap-0.5 text-[11px] font-medium"
+                style={{ color: m.trend === "up" ? "var(--tl-ok)" : "var(--tl-warn)" }}
+              >
+                {m.trend === "up" ? (
+                  <ArrowUpRight className="h-3 w-3" />
+                ) : (
+                  <ArrowDownRight className="h-3 w-3" />
+                )}
+                {m.delta}
+              </span>
+            </div>
+            {/* Sparkline Simplified */}
+            <div className="mt-3 h-7 w-full opacity-50 bg-[var(--tl-accent-soft)] rounded" />
           </div>
-        </div>
+        ))}
+      </div>
 
-        {/* Tabs */}
-        <div className="flex gap-4 border-b mb-6">
-          {['Overview', 'Analytics', 'Settings'].map(tab => (
-            <button key={tab} onClick={() => setActiveTab(tab)} className={`pb-2 ${activeTab === tab ? 'border-b-2 border-blue-600 font-bold' : ''}`}>
-              {tab}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        {/* Tours Table */}
+        <section className="lg:col-span-2 rounded-[var(--tl-radius)] border border-[var(--tl-border)] bg-[var(--tl-panel)] shadow-sm">
+          <div className="flex items-center justify-between border-b border-[var(--tl-border)] px-4 py-3">
+            <h2 className="text-[13px] font-semibold">Your tours</h2>
+            <button className="flex items-center gap-1 text-[12px] text-[var(--tl-muted)] transition-colors hover:text-[var(--tl-fg)]">
+              View all <ChevronRight className="h-3.5 w-3.5" />
             </button>
-          ))}
-        </div>
+          </div>
+          <div className="divide-y divide-[var(--tl-border)]">
+            {tours.map((t) => (
+              <div
+                key={t.id}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--tl-panel-2)] cursor-pointer"
+              >
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--tl-radius-sm)] bg-[var(--tl-accent-soft)]">
+                  <Layers className="h-4 w-4 text-[var(--tl-accent)]" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-medium">{t.name}</p>
+                  <p className="truncate text-[11px] text-[var(--tl-faint)]">
+                    {t.app} · {t.steps} steps
+                  </p>
+                </div>
+                <div className="hidden w-24 sm:block">
+                  <div className="h-1.5 w-full bg-[var(--tl-panel-2)] rounded-full overflow-hidden">
+                    <div className="h-full bg-[var(--tl-accent)]" style={{ width: `${t.completion}%` }} />
+                  </div>
+                </div>
+                <span className="hidden w-16 text-right text-[11px] text-[var(--tl-faint)] md:block">
+                  {t.updated}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
 
-        {/* Tabs Content */}
-        <div className="mt-6">
-          {activeTab === 'Overview' && (
-            <div id="settings-form" className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-bold mb-4">Overview Dashboard</h3>
-              <p>Welcome to your project overview. All your stats are here.</p>
-            </div>
-          )}
-          {activeTab === 'Analytics' && (
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-bold mb-4">Analytics</h3>
-              <p>Here you can see your traffic and user engagement charts.</p>
-            </div>
-          )}
-          {activeTab === 'Settings' && (
-            <div id="settings-form" className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-bold mb-4">Update Settings</h3>
-              <input type="text" placeholder="Project Name" className="border p-2 w-full mb-4 rounded" />
-              <textarea placeholder="Description" className="border p-2 w-full mb-4 rounded"></textarea>
-              <button className="bg-green-600 text-white px-6 py-2 rounded">Save Settings</button>
-            </div>
-          )}
-        </div>
+        {/* Scan Feed */}
+        <section className="rounded-[var(--tl-radius)] border border-[var(--tl-border)] bg-[var(--tl-panel)] shadow-sm">
+          <div className="flex items-center justify-between border-b border-[var(--tl-border)] px-4 py-3">
+            <h2 className="text-[13px] font-semibold">Recent scans</h2>
+            <ScanLine className="h-4 w-4 text-[var(--tl-faint)]" />
+          </div>
+          <div className="space-y-1 p-2">
+            {scanFeed.map((s) => (
+              <div
+                key={s.id}
+                className="flex items-center gap-3 rounded-[var(--tl-radius-sm)] px-2 py-2 transition-colors hover:bg-[var(--tl-panel-2)]"
+              >
+                <div
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--tl-accent-soft)]"
+                >
+                  {s.status === "running" ? (
+                    <ScanLine className="h-3.5 w-3.5 animate-pulse text-[var(--tl-accent)]" />
+                  ) : (
+                    <Check className="h-3.5 w-3.5 text-[var(--tl-accent)]" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[12px]">{s.app}</p>
+                  <p className="text-[11px] text-[var(--tl-faint)]">
+                    {s.elements} elements · {s.time}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-[var(--tl-border)] p-3">
+            <button className="flex w-full items-center justify-center gap-1.5 rounded-[var(--tl-radius-sm)] border border-dashed border-[var(--tl-border-strong)] py-2 text-[12px] text-[var(--tl-muted)] transition-colors hover:text-[var(--tl-fg)]">
+              <Plus className="h-3.5 w-3.5" /> Scan a new page
+            </button>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

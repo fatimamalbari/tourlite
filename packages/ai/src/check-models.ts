@@ -1,8 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 async function listModels() {
-  // Hardcoding key to avoid process.env issues
-  const apiKey = 'YOUR_API_KEY_HERE' 
+  // Use the API key from environment
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+  if (!apiKey) {
+    console.error('No API Key found! Please set GOOGLE_GENERATIVE_AI_API_KEY environment variable.')
+    return
+  }
   
   try {
     console.log('Fetching available models...')
