@@ -17,7 +17,7 @@ export default function Home() {
       {/* Heading */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Welcome back, Fatima</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Welcome back, Jordan</h1>
           <p className="mt-1 text-[13px] text-[var(--tl-muted)]">
             Your AI-generated onboarding tours across 2 connected apps.
           </p>
@@ -69,7 +69,7 @@ export default function Home() {
             {tours.map((t) => (
               <div
                 key={t.id}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--tl-panel-2)] cursor-pointer"
+                className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors"
               >
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--tl-radius-sm)] bg-[var(--tl-accent-soft)]">
                   <Layers className="h-4 w-4 text-[var(--tl-accent)]" />

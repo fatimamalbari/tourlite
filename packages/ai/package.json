@@ -13,6 +13,6 @@
     "typescript": "latest"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1"
+    "@google/genai": "^2.7.0"
   }
 }

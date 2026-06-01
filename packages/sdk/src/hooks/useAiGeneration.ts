@@ -7,7 +7,9 @@ export function useAiGeneration() {
   const [isGenerating, setIsGenerating] = useState(false)
 
   const generate = useCallback(async (goal: string) => {
-    if (!goal) return
+    if (!goal || !goal.trim()) {
+      throw new Error('Please provide a goal for AI generation.')
+    }
     setIsGenerating(true)
 
     try {
@@ -27,7 +29,7 @@ export function useAiGeneration() {
       return tour
     } catch (error) {
       console.error('AI Generation Hook Error:', error)
-      throw error
+      throw new Error('AI generation failed. See console for details.')
     } finally {
       setIsGenerating(false)
     }

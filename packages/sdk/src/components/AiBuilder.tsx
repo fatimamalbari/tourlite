@@ -9,7 +9,10 @@ export const AiBuilder: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   const handleGenerate = async () => {
-    if (!goal) return
+    if (!goal.trim()) {
+      alert('Please enter a goal before generating a tour.')
+      return
+    }
     setIsGenerating(true)
 
     try {
@@ -28,7 +31,7 @@ export const AiBuilder: React.FC = () => {
       startTour(tour)
       setIsOpen(false)
     } catch (error) {
-      console.log("Error generating tour...", error)
+      console.log('Error generating tour...', error)
       alert('Error generating tour. Make sure your API route is set up.')
     } finally {
       setIsGenerating(false)
@@ -92,7 +95,11 @@ export const AiBuilder: React.FC = () => {
         Describe what you want to explain, and our AI will build the tour for you.
       </p>
 
+      <label htmlFor="ai-tour-goal" style={{ display: 'block', marginBottom: '8px', fontSize: '0.95rem', fontWeight: 600 }}>
+        Tour goal
+      </label>
       <input
+        id="ai-tour-goal"
         type="text"
         value={goal}
         onChange={(e) => setGoal(e.target.value)}

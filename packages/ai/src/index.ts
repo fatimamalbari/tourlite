@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
 
 export interface ScannedElement {
   id: string
@@ -23,17 +23,14 @@ export interface GeneratedTour {
 }
 
 export class TourAIGenerator {
-  private genAI: GoogleGenerativeAI
+  private genAI: GoogleGenAI
 
   constructor(apiKey: string) {
-    this.genAI = new GoogleGenerativeAI(apiKey)
+    this.genAI = new GoogleGenAI({ apiKey })
   }
 
   async generateTour(goal: string, elements: ScannedElement[]): Promise<GeneratedTour> {
     console.log('Generating tour for goal:', goal)
-
-    // Switching to the 8b version which is widely available in free tiers
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-3.5-flash' })
 
     const systemPrompt = `
       You are an expert UX Onboarding Engineer. Your goal is to create a multi-step product tour based on a user's goal and the available UI elements.
@@ -63,9 +60,15 @@ export class TourAIGenerator {
     `
 
     try {
-      const result = await model.generateContent(systemPrompt)
-      const response = await result.response
-      const text = response.text().trim()
+      const response = await this.genAI.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: systemPrompt,
+      })
+      const text = response.text?.trim() ?? ''
+
+      if (!text) {
+        throw new Error('No response text returned from the Gemini API.')
+      }
 
       // Remove markdown backticks if Gemini includes them
       const jsonString = text.replace(/^```json\s*/, '').replace(/\s*```$/, '')

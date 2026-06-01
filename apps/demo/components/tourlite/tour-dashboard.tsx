@@ -55,15 +55,46 @@ const APPS = [
 export function TourDashboard({ theme }: { theme: TourLiteTheme }) {
   const [view, setView] = useState<"overview" | "editor">("overview")
   const [activeNav, setActiveNav] = useState("dashboard")
-  const [selectedTour, setSelectedTour] = useState<Tour>(tours[0])
-  const [selectedStep, setSelectedStep] = useState<TourStep>(editorSteps[0])
+  const [selectedTour, setSelectedTour] = useState<Tour>(
+    tours[0] ?? {
+      id: 't-fallback',
+      name: 'Default tour',
+      app: 'app.northwind.io',
+      status: 'draft',
+      steps: 0,
+      completion: 0,
+      updated: 'unknown',
+      author: 'AI',
+    }
+  )
+  const [selectedStep, setSelectedStep] = useState<TourStep>(
+    editorSteps[0] ?? {
+      id: 's-fallback',
+      index: 1,
+      title: 'Step details unavailable',
+      selector: '',
+      element: 'Unknown element',
+      body: 'No step data is available.',
+      placement: 'bottom',
+    }
+  )
 
   const head = theme.monoHeadings ? "font-mono tracking-tight" : "font-sans tracking-tight"
   const dense = theme.compact
 
   const openEditor = (tour: Tour) => {
     setSelectedTour(tour)
-    setSelectedStep(editorSteps[0])
+    setSelectedStep(
+      editorSteps[0] ?? {
+        id: 's-fallback',
+        index: 1,
+        title: 'Step details unavailable',
+        selector: '',
+        element: 'Unknown element',
+        body: 'No step data is available.',
+        placement: 'bottom',
+      }
+    )
     setActiveNav("tours")
     setView("editor")
   }

@@ -1,13 +1,20 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
 
 async function listModels() {
-  // Hardcoding key just for debug to bypass process.env issues
-  const genAI = new GoogleGenerativeAI('YOUR_API_KEY_HERE')
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
+  if (!apiKey) {
+    console.error('No API Key found! Please set GOOGLE_GENERATIVE_AI_API_KEY, GEMINI_API_KEY, or GOOGLE_API_KEY.')
+    return
+  }
+
+  const ai = new GoogleGenAI({ apiKey })
   try {
     console.log('Fetching models...')
-    // Use the official model listing method
-    const models = await genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-    console.log('Success!')
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: 'List the top three Gemini models available',
+    })
+    console.log('Success! Response text:', response.text)
   } catch (error: any) {
     console.log('--- Model Discovery Error ---')
     console.log(error.message)

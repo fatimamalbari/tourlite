@@ -3,7 +3,7 @@ import { TourAIGenerator } from '@tour-ai/ai'
 
 export async function POST(request: Request) {
   console.log('--- API Request Received: /api/generate-tour ---')
-  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.OPENAI_API_KEY
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
   console.log('API Key present:', !!apiKey)
 
   if (!apiKey) {
@@ -25,10 +25,10 @@ export async function POST(request: Request) {
     console.log('Tour generated successfully')
 
     return NextResponse.json(tour)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Route Error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to generate tour' },
+      { error: 'Failed to generate tour' },
       { status: 500 }
     )
   }

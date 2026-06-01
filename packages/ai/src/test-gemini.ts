@@ -1,18 +1,20 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
 
 async function testConnection() {
-  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
   if (!apiKey) {
-    console.error('No API Key found! Please set GOOGLE_GENERATIVE_AI_API_KEY environment variable.')
+    console.error('No API Key found! Please set GOOGLE_GENERATIVE_AI_API_KEY, GEMINI_API_KEY, or GOOGLE_API_KEY.')
     return
   }
-  const genAI = new GoogleGenerativeAI(apiKey)
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+  const ai = new GoogleGenAI({ apiKey })
 
   try {
-    console.log('Testing connection with gemini-1.5-flash...')
-    const result = await model.generateContent('Hi, say hello!')
-    console.log('Success! AI Response:', result.response.text())
+    console.log('Testing connection with gemini-2.5-flash...')
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: 'Hi, say hello!'
+    })
+    console.log('Success! AI Response:', response.text)
   } catch (error: any) {
     console.error('API Error:', error.message)
     if (error.status) console.error('Status Code:', error.status)

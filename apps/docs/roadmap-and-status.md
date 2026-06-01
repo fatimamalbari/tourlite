@@ -21,7 +21,7 @@ TourAI is an AI-native onboarding SDK designed to generate product tours automat
 - [x] **Robust Selectors**: Generates unique CSS paths using IDs or hierarchical `nth-of-type` fallbacks.
 
 ### Phase 3: AI Suggestions (The Brain)
-- [x] **Multi-LLM Support**: Configured for both OpenAI and Google Gemini (`gemini-3.5-flash`).
+- [x] **Multi-LLM Support**: Configured for Google Gemini (`gemini-3.5-flash`).
 - [x] **Prompt Engineering**: System prompt designed to act as a "UX Onboarding Engineer."
 - [x] **Magic Wand UI**: Floating developer tool to trigger real-time AI generation.
 - [x] **Secure Bridge**: Next.js API route created to handle AI requests without exposing keys to the client.
