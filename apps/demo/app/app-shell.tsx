@@ -47,9 +47,11 @@ function ShellContent({ children }: { children: React.ReactNode }) {
       })
 
       setIsModalOpen(false)
-      window.location.reload(); // Refresh to see new tour in list
+      // Trigger a silent update of the lists
+      window.dispatchEvent(new Event('refreshData'))
     } catch (error) {
-      alert('Failed to generate tour. Check your API key.')
+      console.error('AI Generation Error:', error)
+      alert('Failed to generate tour. Check your API key or console for details.')
     }
   }
 
@@ -68,7 +70,9 @@ function ShellContent({ children }: { children: React.ReactNode }) {
 
     console.table(elements)
     alert(`Scanned ${elements.length} elements. View them in the console!`)
-    window.location.reload(); // Refresh to see new scan in feed
+    
+    // Trigger a silent update of the lists
+    window.dispatchEvent(new Event('refreshData'))
   }
 
   const NAV = [

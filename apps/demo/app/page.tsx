@@ -34,7 +34,14 @@ export default function Home() {
         setIsLoading(false);
       }
     }
+    
     fetchData();
+
+    // Listen for custom refresh events
+    const handleRefresh = () => fetchData();
+    window.addEventListener('refreshData', handleRefresh);
+    
+    return () => window.removeEventListener('refreshData', handleRefresh);
   }, []);
 
   return (
