@@ -11,6 +11,7 @@ import {
   Plus 
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 export default function Home() {
   const [tours, setTours] = useState<any[]>([]);
@@ -19,15 +20,15 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchData() {
+      console.log("[Dashboard] Fetching fresh data from database...")
       try {
         const [toursRes, scansRes] = await Promise.all([
-          fetch('/api/tours', { cache: 'no-store' }),
-          fetch('/api/scans', { cache: 'no-store' })
+          api.get('/api/tours'),
+          api.get('/api/scans')
         ]);
-        const toursData = await toursRes.json();
-        const scansData = await scansRes.json();
-        setTours(toursData);
-        setScans(scansData);
+        console.log("[Dashboard] Fetched Tours:", toursRes.data.length)
+        setTours(toursRes.data);
+        setScans(scansRes.data);
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -38,7 +39,10 @@ export default function Home() {
     fetchData();
 
     // Listen for custom refresh events
-    const handleRefresh = () => fetchData();
+    const handleRefresh = () => {
+      console.log("[Dashboard] 'refreshData' event received. Triggering fetch...")
+      fetchData()
+    };
     window.addEventListener('refreshData', handleRefresh);
     
     return () => window.removeEventListener('refreshData', handleRefresh);

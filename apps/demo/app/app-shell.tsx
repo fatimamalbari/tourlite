@@ -16,6 +16,8 @@ import {
   Settings as SettingsIcon,
 } from 'lucide-react'
 import { GenerateTourModal } from '@/components/tourlite/GenerateTourModal'
+import { api } from '@/lib/api'
+import { toast } from '@/hooks/use-toast'
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -34,46 +36,45 @@ function ShellContent({ children }: { children: React.ReactNode }) {
   const handleGenerate = async (goal: string) => {
     try {
       const tour = await generate(goal)
-      
+
       // Save tour to database
-      await fetch('/api/tours', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: tour.name || `Tour for ${goal}`,
-          appUrl: window.location.href,
-          steps: tour.steps
-        }),
+      await api.post('/api/tours', {
+        name: tour.name || `Tour for ${goal}`,
+        appUrl: window.location.href,
+        steps: tour.steps
       })
 
       setIsModalOpen(false)
+      toast.success('Tour generated!', 'Your new AI tour has been saved successfully.')
+
       // Trigger a silent update of the lists
       window.dispatchEvent(new Event('refreshData'))
     } catch (error) {
+      // Error is caught and toasted by the Axios interceptor
       console.error('AI Generation Error:', error)
-      alert('Failed to generate tour. Check your API key or console for details.')
     }
   }
 
   const handleScan = async () => {
-    const elements = scanPage()
-    
-    // Save scan to database
-    await fetch('/api/scans', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    try {
+      const elements = scanPage()
+
+      // Save scan to database
+      await api.post('/api/scans', {
         appUrl: window.location.href,
         elements: elements.length
-      }),
-    })
+      })
 
-    console.table(elements)
-    alert(`Scanned ${elements.length} elements. View them in the console!`)
-    
-    // Trigger a silent update of the lists
-    window.dispatchEvent(new Event('refreshData'))
+      console.table(elements)
+      toast.success('Scan complete', `Found ${elements.length} interactable elements.`)
+
+      // Trigger a silent update of the lists
+      window.dispatchEvent(new Event('refreshData'))
+    } catch (error) {
+      console.error('Scan Error:', error)
+    }
   }
+
 
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: Route, href: '/' },

@@ -12,6 +12,7 @@
   "dependencies": {
     "@tour-ai/ai": "workspace:^",
     "@tour-ai/sdk": "workspace:^",
+    "axios": "^1.17.0",
     "better-sqlite3": "^12.10.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
