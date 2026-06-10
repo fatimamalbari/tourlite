@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Sparkles, X, Wand2 } from 'lucide-react'
 
 interface GenerateTourModalProps {
@@ -17,11 +17,58 @@ export const GenerateTourModal: React.FC<GenerateTourModalProps> = ({
   isGenerating
 }) => {
   const [goal, setGoal] = useState('Show me the dashboard features')
+  const modalRef = useRef<HTMLDivElement | null>(null)
 
-  // Reset goal when opening
+  // Reset goal and focus first focusable element when opening
   useEffect(() => {
-    if (isOpen) setGoal('Show me the dashboard features')
+    if (isOpen) {
+      setGoal('Show me the dashboard features')
+      const timeout = window.setTimeout(() => {
+        modalRef.current?.querySelector<HTMLElement>('textarea, button, input')?.focus()
+      }, 0)
+      return () => window.clearTimeout(timeout)
+    }
   }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        onClose()
+        return
+      }
+
+      if (event.key !== 'Tab' || !modalRef.current) return
+
+      const focusableElements = Array.from(
+        modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((element) => !element.hasAttribute('disabled'))
+
+      if (focusableElements.length === 0) return
+
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+
+      if (event.shiftKey) {
+        if (document.activeElement === firstElement) {
+          event.preventDefault()
+          lastElement.focus()
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          event.preventDefault()
+          firstElement.focus()
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
 
   if (!isOpen) return null
 
@@ -34,7 +81,14 @@ export const GenerateTourModal: React.FC<GenerateTourModalProps> = ({
       />
       
       {/* Modal Panel */}
-      <div className="relative w-full max-w-lg overflow-hidden rounded-[var(--tl-radius)] border border-[var(--tl-border-strong)] bg-[var(--tl-panel)] shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="generate-tour-title"
+        aria-describedby="generate-tour-description"
+        className="relative w-full max-w-lg overflow-hidden rounded-[var(--tl-radius)] border border-[var(--tl-border-strong)] bg-[var(--tl-panel)] shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300"
+      >
         
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--tl-border)] px-6 py-4">
@@ -43,8 +97,8 @@ export const GenerateTourModal: React.FC<GenerateTourModalProps> = ({
               <Sparkles className="h-4 w-4 text-[var(--tl-accent)]" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold tracking-tight text-[var(--tl-fg)]">Generate AI Tour</h3>
-              <p className="text-xs text-[var(--tl-faint)]">Powered by TourLite Intelligence</p>
+              <h3 id="generate-tour-title" className="text-lg font-semibold tracking-tight text-[var(--tl-fg)]">Generate AI Tour</h3>
+              <p id="generate-tour-description" className="text-xs text-[var(--tl-faint)]">Powered by TourLite Intelligence</p>
             </div>
           </div>
           <button 
@@ -57,12 +111,12 @@ export const GenerateTourModal: React.FC<GenerateTourModalProps> = ({
 
         {/* Content */}
         <div className="p-6">
-          <label className="mb-2 block text-[11px] font-medium uppercase tracking-wider text-[var(--tl-faint)]">
+          <label htmlFor="generate-tour-goal" className="mb-2 block text-[11px] font-medium uppercase tracking-wider text-[var(--tl-faint)]">
             What should this tour explain?
           </label>
           <div className="relative">
             <textarea
-              autoFocus
+              id="generate-tour-goal"
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
               placeholder="e.g. 'Show me how to manage my team members'"

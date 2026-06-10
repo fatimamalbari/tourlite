@@ -50,13 +50,16 @@ function getElementLabel(el: HTMLElement): string {
  * Generates a stable CSS selector for the element.
  */
 function generateSelector(el: HTMLElement): string {
-  if (el.id) return `#${el.id}`
+  if (el.id) return `#${CSS.escape ? CSS.escape(el.id) : el.id}`
   
   // Try to find a unique attribute
   const uniqueAttrs = ['name', 'data-testid', 'data-qa']
   for (const attr of uniqueAttrs) {
     const val = el.getAttribute(attr)
-    if (val) return `[${attr}="${val}"]`
+    if (val) {
+      const escaped = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(val) : val.replace(/(["\\])/g, '\\$1')
+      return `[${attr}="${escaped}"]`
+    }
   }
 
   const path: string[] = []
@@ -91,6 +94,10 @@ function generateSelector(el: HTMLElement): string {
  * Scans the page for interactable elements and returns a "Map of Intent".
  */
 export function scanPage(): InteractableElement[] {
+  if (typeof document === 'undefined' || typeof window === 'undefined') {
+    return []
+  }
+
   const interactables: InteractableElement[] = []
   
   // Broad discovery query

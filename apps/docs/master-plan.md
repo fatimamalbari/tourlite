@@ -7,13 +7,13 @@ Build "The easiest lightweight onboarding SDK" with AI-native tour generation, t
 1. **Tooltip Tour Engine**: Core navigation logic (`start`, `next`, `prev`, `end`).
 2. **React SDK**: Easy integration via `<TourProvider>`.
 3. **Smart Element Targeting**: Robust CSS selector support.
-4. **AI Tour Generation**: Convert DOM/Page descriptions into structured tour steps via OpenAI.
+4. **AI Tour Generation**: Convert DOM/Page descriptions into structured tour steps via Google Gemini.
 5. **Tiny Bundle**: Aggressive tree-shaking and minimal dependencies.
 
 ## Tech Stack
 - **Monorepo**: `pnpm` workspaces + `turborepo`.
 - **SDK**: TypeScript, `tsup` (bundling), React, `Floating UI` (positioning).
-- **AI**: OpenAI API (GPT-4o/GPT-4o-mini).
+- **AI**: Google Gemini via the `@google/genai` SDK.
 - **Demo/Docs**: Next.js + Tailwind CSS.
 
 ## Project Structure

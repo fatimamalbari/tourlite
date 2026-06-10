@@ -1,32 +1,23 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
 
 async function checkKey() {
-  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
   if (!apiKey) {
-    console.error('No API Key found! Please set GOOGLE_GENERATIVE_AI_API_KEY environment variable.')
+    console.error('No API Key found! Please set GOOGLE_GENERATIVE_AI_API_KEY, GEMINI_API_KEY, or GOOGLE_API_KEY.')
     return
   }
   console.log('Testing new API Key...')
   
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`)
-    const data = await response.json()
-    
-    if (data.models) {
-      console.log('Success! Supported Models:')
-      data.models.forEach((m: any) => console.log(`- ${m.name}`))
-      
-      const hasFlash = data.models.some((m: any) => m.name.includes('gemini-1.5-flash'))
-      if (hasFlash) {
-        console.log('✅ gemini-1.5-flash is supported!')
-      } else {
-        console.log('❌ gemini-1.5-flash is NOT in the list.')
-      }
-    } else {
-      console.log('Error:', data)
-    }
+    const ai = new GoogleGenAI({ apiKey })
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: 'This is a key validation check.'
+    })
+    console.log('Success! Response text:', response.text)
   } catch (error: any) {
-    console.error('Fetch Error:', error.message)
+    console.error('API Error:', error.message)
+    if (error.status) console.error('Status Code:', error.status)
   }
 }
 

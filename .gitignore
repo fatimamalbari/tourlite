@@ -3,3 +3,6 @@ node_modules
 dist
 .next
 .env
+sqlite.db
+.gemini/
+gha-creds-*.json
