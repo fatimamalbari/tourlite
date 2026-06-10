@@ -4,6 +4,8 @@ import { desc } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import { v4 as uuidv4 } from "uuid"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const allScans = await db.select().from(scans).orderBy(desc(scans.createdAt)).limit(10)

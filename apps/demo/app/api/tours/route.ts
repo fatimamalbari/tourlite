@@ -4,6 +4,8 @@ import { desc } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import { v4 as uuidv4 } from "uuid"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const allTours = await db.select().from(tours).orderBy(desc(tours.updatedAt))

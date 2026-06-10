@@ -21,8 +21,8 @@ export default function Home() {
     async function fetchData() {
       try {
         const [toursRes, scansRes] = await Promise.all([
-          fetch('/api/tours'),
-          fetch('/api/scans')
+          fetch('/api/tours', { cache: 'no-store' }),
+          fetch('/api/scans', { cache: 'no-store' })
         ]);
         const toursData = await toursRes.json();
         const scansData = await scansRes.json();
